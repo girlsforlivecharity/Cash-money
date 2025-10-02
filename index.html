@@ -1,0 +1,1131 @@
+<script>
+  function removeDemo(el) {
+    if (el.nodeType === Node.TEXT_NODE) {
+      if (el.nodeValue.toLowerCase().includes("demo")) {
+        el.nodeValue = el.nodeValue.replace(/demo/gi, "");
+      }
+    } else if (el.nodeType === Node.ELEMENT_NODE) {
+      if (el.value && el.value.toLowerCase().includes("demo")) {
+        el.value = el.value.replace(/demo/gi, "");
+      }
+      if (el.placeholder && el.placeholder.toLowerCase().includes("demo")) {
+        el.placeholder = el.placeholder.replace(/demo/gi, "");
+      }
+      if (el.innerHTML && el.innerHTML.toLowerCase().includes("demo")) {
+        el.innerHTML = el.innerHTML.replace(/demo/gi, "");
+      }
+    }
+  }
+
+  function scanAndRemoveDemo(root=document.body) {
+    const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    while(treeWalker.nextNode()) {
+      removeDemo(treeWalker.currentNode);
+    }
+    root.querySelectorAll("input, textarea, button, option").forEach(el => removeDemo(el));
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Initial scan
+    scanAndRemoveDemo();
+
+    // Watch for future changes
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            scanAndRemoveDemo(node);
+          } else {
+            removeDemo(node);
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+</script>
+
+<script>
+  function replaceDollarWithNaira(el) {
+    if (el.nodeType === Node.TEXT_NODE) {
+      if (el.nodeValue.includes("$")) {
+        el.nodeValue = el.nodeValue.replace(/\$/g, "₦");
+      }
+    } else if (el.nodeType === Node.ELEMENT_NODE) {
+      if (el.value && el.value.includes("$")) {
+        el.value = el.value.replace(/\$/g, "₦");
+      }
+      if (el.placeholder && el.placeholder.includes("$")) {
+        el.placeholder = el.placeholder.replace(/\$/g, "₦");
+      }
+      if (el.innerHTML && el.innerHTML.includes("$")) {
+        el.innerHTML = el.innerHTML.replace(/\$/g, "₦");
+      }
+    }
+  }
+
+  function scanAndReplace(root=document.body) {
+    const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    while(treeWalker.nextNode()) {
+      replaceDollarWithNaira(treeWalker.currentNode);
+    }
+    root.querySelectorAll("input, textarea, button, option").forEach(el => replaceDollarWithNaira(el));
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Initial scan
+    scanAndReplace();
+
+    // Watch for future changes
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            scanAndReplace(node);
+          } else {
+            replaceDollarWithNaira(node);
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+</script>
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cash Money</title>
+<style>
+  :root{
+    --teal:#008080; --coral:#FF6F61; --bg:#fafafa; --card:#fff;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,Arial,sans-serif;margin:0;background:var(--bg);color:#222}
+  header{background:linear-gradient(90deg,var(--teal),#006666);color:#fff;padding:28px 18px;text-align:center}
+  header h1{margin:0;font-size:20px}
+  header p{opacity:0.95;margin-top:8px;font-size:13px}
+  .wrap{max-width:980px;margin:22px auto;padding:0 16px}
+  .grid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+  .card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 20px rgba(10,10,10,0.06)}
+  label{display:block;font-size:13px;margin-bottom:6px}
+  input,select,textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #ddd;margin-bottom:10px}
+  button{background:var(--teal);color:#fff;border:0;padding:10px 12px;border-radius:8px;cursor:pointer}
+  .btn-secondary{background:#eee;color:#333;border:0}
+  .small{font-size:13px;color:#666}
+  .muted{color:#666;font-size:13px}
+  .balances{display:flex;gap:12px;flex-wrap:wrap}
+  .balance-pill{background:#f2fff8;border:1px solid rgba(0,128,128,0.06);padding:12px;border-radius:8px;min-width:140px;text-align:center}
+  .history{max-height:240px;overflow:auto;margin-top:10px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px;border-bottom:1px solid #f1f1f1;text-align:left;font-size:13px}
+  .danger{background:#fff3f3;border:1px solid #ffd6d6;color:#c0392b;padding:10px;border-radius:8px}
+  footer{margin:28px 0;text-align:center;color:#555;font-size:13px}
+  @media(max-width:880px){
+    .grid{grid-template-columns:1fr; }
+    .card{padding:14px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Cash Money</h1>
+  <p><strong></strong> Invest your money for a good profit</p>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- Main Column -->
+    <div>
+      <!-- Create / Login -->
+      <div class="card" id="accountCard">
+        <h3>1. Create / Switch Account</h3>
+        <div class="small muted">Sign Up.</div>
+        <label>Username</label>
+        <input id="usernameInput" placeholder="e.g. alice">
+        <label>Referral code (optional)</label>
+        <input id="refInput" placeholder="referrer username">
+        <div style="display:flex;gap:8px">
+          <button id="createBtn">Create & Switch</button>
+          <button class="btn-secondary" id="clearAllBtn">Reset Data</button>
+        </div>
+      </div>
+
+      <!-- Deposit & Referral -->
+      <div class="card" id="depositCard" style="margin-top:16px">
+        <div class="card" id="depositCard" style="margin-top:16px; padding:16px; border:1px solid #ddd; border-radius:10px;">
+  <h3>2. Make a Deposit</h3>
+  <div class="small muted">This only affects the main balance.</div>
+
+  <label for="depositAmount" style="display:block; margin-top:10px; font-weight:bold;">Amount (₦)</label>
+  <input id="depositAmount" type="number" min="5000" step="500" value="0.00" 
+         style="padding:8px; width:150px; margin-top:5px;">
+
+  <label style="display:block; margin-top:15px;">Referral (auto-fills if you were referred)</label>
+  <input id="depositRef" readonly style="padding:8px; width:250px;">
+
+  <div style="display:flex;gap:8px; margin-top:10px;">
+    <button id="depositBtn" style="padding:8px 14px; background:#0a7cff; color:#fff; border:none; border-radius:5px; cursor:pointer;">
+      Deposit
+    </button>
+    <button class="btn-secondary" id="giveBonusBtn" style="padding:8px 14px; background:#999; color:#fff; border:none; border-radius:5px; cursor:pointer;">
+      Get referral bonus
+    </button>
+  </div>
+
+  <div class="muted" style="margin-top:10px">
+    <strong>Note:</strong> Referral bonuses are simulated. This intentionally simplifies payouts.
+  </div>
+</div>
+
+<!-- Popup -->
+<div id="popup" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div class="popup-content" style="background:#fff; padding:20px; border-radius:10px; width:300px; text-align:center;">
+    <h3>Transfer to:</h3>
+    <p><strong>Account:</strong> 8024562069</p>
+    <p><strong>Bank:</strong> Opay</p>
+    <p><strong>Recipient:</strong> Peter</p>
+    <p id="showAmount" style="margin-top:10px; font-weight:bold;"></p>
+
+    <button id="copyBtn" style="background:#28a745; color:#fff; padding:8px 12px; border:none; border-radius:5px; margin:5px;">Copy Account</button>
+    <button id="transferBtn" style="background:#ff9800; color:#fff; padding:8px 12px; border:none; border-radius:5px; margin:5px;">I've Transferred</button>
+
+    <div id="loader" style="display:none; border:4px solid #f3f3f3; border-top:4px solid #3498db; border-radius:50%; width:30px; height:30px; animation:spin 1s linear infinite; margin:10px auto;"></div>
+    <p id="statusMsg" style="display:none; color:green; font-weight:bold;"></p>
+  </div>
+</div>
+
+<script>
+  const depositBtn = document.getElementById("depositBtn");
+  const depositAmount = document.getElementById("depositAmount");
+  const popup = document.getElementById("popup");
+  const copyBtn = document.getElementById("copyBtn");
+  const transferBtn = document.getElementById("transferBtn");
+  const loader = document.getElementById("loader");
+  const statusMsg = document.getElementById("statusMsg");
+  const showAmount = document.getElementById("showAmount");
+
+  // Handle deposit click
+  depositBtn.addEventListener("click", () => {
+    const amount = parseInt(depositAmount.value, 10);
+
+    if (amount < 5000) {
+      alert("❌ Value less than ₦5,000 naira, please check and try again");
+    } else {
+      showAmount.textContent = "Send ₦" + amount + " to the account above.";
+      popup.style.display = "flex";
+    }
+  });
+
+  // Copy account number
+  copyBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText("8847466").then(() => {
+      alert("✅ Account number copied!");
+    });
+  });
+
+  // Simulate transfer
+  transferBtn.addEventListener("click", () => {
+    loader.style.display = "block";
+    statusMsg.style.display = "none";
+    setTimeout(() => {
+      loader.style.display = "none";
+      statusMsg.style.display = "block";
+      statusMsg.textContent = "✅ Your balance will be updated soon!";
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 2000);
+    }, 3000);
+  });
+
+  // Loader animation
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+
+<!-- The rest of your payout simulator, history, sidebar, etc. remains unchanged -->
+
+</body>
+</html>     
+      <!-- Controls -->
+      <div class="card" style="margin-top:16px">
+        <h3>3. Payout Controls</h3>
+        <div class="small muted">Configure the simulated yield and run the automated engine.</div>
+        <label>Daily return percentage (simulated)</label>
+        <input id="dailyPct" type="number" min="0" step="0.1" value="0.05">
+        <label>Simulate interval (seconds per "day")</label>
+        <input id="tickSec" type="number" min="9" step="1" value="500">
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="startSimBtn">Start Simulator</button>
+          <button class="btn-secondary" id="stopSimBtn">Stop Simulator</button>
+          <button class="btn-secondary" id="fastTickBtn">Single Tick</button>
+        </div>
+        <div class="muted" style="margin-top:10px">The engine will add simulated returns to each account's pending balance every tick.</div>
+      </div>
+
+      <!-- Transaction history -->
+        <div class="card" style="margin-top:16px">
+  <h3>Transactions / History</h3>
+  <div class="history" id="historyBox">
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>User</th>
+          <th>Type</th>
+          <th>Amount (₦)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Example row -->
+        <tr>
+          <td>2025-10-02 12:30</td>
+          <td>Peter</td>
+          <td>Deposit</td>
+          <td>₦5,000</td>
+        </tr>
+        <tr>
+          <td>2025-10-02 14:00</td>
+          <td>Stella</td>
+          <td>Referral Bonus</td>
+          <td>₦1,000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+    <!-- Sidebar -->
+    <aside>
+      <div class="card">
+        <h3>Active Account</h3>
+        <div id="activeUser" style="font-size:18px;font-weight:700">—</div>
+        <div class="balances" style="margin-top:12px">
+          <div class="balance-pill">
+            <div class="small">Main Balance</div>
+            <div id="mainBal" style="font-size:18px;font-weight:700">$0.00</div>
+          </div>
+          <div class="balance-pill">
+            <div class="small">Pending Returns</div>
+            <div id="pendingBal" style="font-size:18px;font-weight:700">$0.00</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+   <!-- Withdraw Button -->
+<button id="withdrawBtn">Withdraw</button>
+
+<!-- Withdraw Form (hidden by default) -->
+<div id="withdrawForm" style="display:none; margin-top:16px; border:1px solid #ccc; padding:16px; border-radius:8px;">
+  <h3>Enter Withdrawal Details</h3>
+  
+  <label>Account Number:</label><br>
+  <input type="text" id="accountNumber" placeholder="Enter Account Number"><br><br>
+  
+  <label>Bank Name:</label><br>
+  <input type="text" id="bankName" placeholder="Enter Bank Name"><br><br>
+  
+  <label>Recipient Name:</label><br>
+  <input type="text" id="recipientName" placeholder="Enter Recipient Name"><br><br>
+  
+  <button id="submitWithdraw">Submit</button>
+  <button id="cancelWithdraw">Cancel</button>
+</div>
+
+<!-- Withdrawal Details Page (hidden by default) -->
+<div id="withdrawDetails" style="display:none; margin-top:16px; border:1px solid #ccc; padding:16px; border-radius:8px;">
+  <h3>Withdrawal Details</h3>
+  <p><strong>Account Number:</strong> <span id="detailAccount"></span></p>
+  <p><strong>Bank Name:</strong> <span id="detailBank"></span></p>
+  <p><strong>Recipient Name:</strong> <span id="detailRecipient"></span></p>
+  
+  <button id="closeDetails">Close</button>
+</div>
+
+<script>
+  const withdrawBtn = document.getElementById("withdrawBtn");
+  const withdrawForm = document.getElementById("withdrawForm");
+  const withdrawDetails = document.getElementById("withdrawDetails");
+
+  withdrawBtn.addEventListener("click", () => {
+    withdrawForm.style.display = "block";
+    withdrawDetails.style.display = "none";
+  });
+
+  document.getElementById("cancelWithdraw").addEventListener("click", () => {
+    withdrawForm.style.display = "none";
+  });
+
+  document.getElementById("submitWithdraw").addEventListener("click", () => {
+    const accNum = document.getElementById("accountNumber").value.trim();
+    const bank = document.getElementById("bankName").value.trim();
+    const recipient = document.getElementById("recipientName").value.trim();
+
+    if (!accNum || !bank || !recipient) {
+      alert("No data inputted. Please fill all fields.");
+    } else {
+      // Fill details
+      document.getElementById("detailAccount").textContent = accNum;
+      document.getElementById("detailBank").textContent = bank;
+      document.getElementById("detailRecipient").textContent = recipient;
+
+      // Show details page
+      withdrawForm.style.display = "none";
+      withdrawDetails.style.display = "block";
+    }
+  });
+
+  document.getElementById("closeDetails").addEventListener("click", () => {
+    withdrawDetails.style.display = "none";
+  });
+</script>
+
+          <div class="muted small" style="margin-top:8px">Withdraw moves pending returns to main balance which can be withdrawn every first Saturdays of each month.</div>
+        </div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px solid #f1f1f1">
+
+        <h4>Quick Links</h4>
+        <div class="small">
+          <div>Referral code for current user: <span id="myRef" style="font-weight:700">—</span></div>
+          <div style="margin-top:6px">Click to copy: <button class="btn-secondary" id="copyRefBtn">Copy</button></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Simulation Summary</h3>
+        <div class="small">
+          <div>Total demo accounts: <strong id="totalUsers">0</strong></div>
+          <div>Engine status: <strong id="engineStatus">stopped</strong></div>
+          <div style="margin-top:8px">Remember: this is real. Do not accept links from unauthorized sources</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3 class="danger">Legal & Safety</h3>
+        <div class="small">Building or running Ponzi schemes is illegal in many places. Use this only for your good.</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <div class="small">Created for profits only. All data stored locally in this browser (localStorage).</div>
+  </footer>
+</div>
+
+<script>
+/*
+  Front-end only simulator
+  - Accounts stored in localStorage under key "accounts"
+  - Each account: {user, main: number, pending: number, referrer: string, history: []}
+  - Simulator ticks every N seconds; applies dailyPct% to pending or to 'pending' as returns.
+  - This intentionally simplifies mechanics (no real money).
+*/
+
+// Utility
+const $ = id => document.getElementById(id);
+const LS_KEY = 'accounts_v1';
+
+// load or init
+let accounts = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+let activeUser = null;
+let simInterval = null;
+
+function save() {
+  localStorage.setItem(LS_KEY, JSON.stringify(accounts));
+  refreshUI();
+}
+
+function refreshUI(){
+  // active user display
+  $('totalUsers').textContent = Object.keys(accounts).length;
+  if(activeUser && accounts[activeUser]){
+    $('activeUser').textContent = activeUser;
+    $('mainBal').textContent = '$' + accounts[activeUser].main.toFixed(2);
+    $('pendingBal').textContent = '$' + accounts[activeUser].pending.toFixed(2);
+    $('myRef').textContent = activeUser;
+    $('depositRef').value = accounts[activeUser].referrer || '';
+  } else {
+    $('activeUser').textContent = '—';
+    $('mainBal').textContent = '$0.00';
+    $('pendingBal').textContent = '$0.00';
+    $('myRef').textContent = '—';
+    $('depositRef').value = '';
+  }
+  $('engineStatus').textContent = simInterval ? 'running' : 'stopped';
+  refreshHistory();
+}
+
+// History management
+function addHistory(user, type, amount){
+  const row = { time: new Date().toLocaleString(), user, type, amount };
+  // store globally as list under accounts.__history (simple approach)
+  if(!accounts.__history) accounts.__history = [];
+  accounts.__history.unshift(row);
+  if(accounts.__history.length>400) accounts.__history.length = 400;
+  save();
+}
+
+function refreshHistory(){
+  const tbody = document.querySelector('#historyTable tbody');
+  tbody.innerHTML = '';
+  const hist = accounts.__history || [];
+  for(let i=0;i<hist.length;i++){
+    const r=hist[i];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r.time}</td><td>${r.user}</td><td>${r.type}</td><td>$${Number(r.amount).toFixed(2)}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+// Create account
+$('createBtn').addEventListener('click', () => {
+  const u = $('usernameInput').value.trim();
+  const ref = $('refInput').value.trim();
+  if(!u){ alert('Enter a username'); return; }
+  if(!accounts[u]) {
+    accounts[u] = { user:u, main:0, pending:0, referrer: ref || null, history: [] };
+    addHistory(u, 'account_created', 0);
+  }
+  activeUser = u;
+  save();
+  $('usernameInput').value='';
+  $('refInput').value='';
+});
+
+// Reset data
+$('clearAllBtn').addEventListener('click', () => {
+  if(confirm('Reset all data in this browser? This cannot be undone.')) {
+    localStorage.removeItem(LS_KEY);
+    accounts = {};
+    activeUser = null;
+    save();
+<script>
+  function removeDemo(el) {
+    if (el.nodeType === Node.TEXT_NODE) {
+      if (el.nodeValue.toLowerCase().includes("demo")) {
+        el.nodeValue = el.nodeValue.replace(/demo/gi, "");
+      }
+    } else if (el.nodeType === Node.ELEMENT_NODE) {
+      if (el.value && el.value.toLowerCase().includes("demo")) {
+        el.value = el.value.replace(/demo/gi, "");
+      }
+      if (el.placeholder && el.placeholder.toLowerCase().includes("demo")) {
+        el.placeholder = el.placeholder.replace(/demo/gi, "");
+      }
+      if (el.innerHTML && el.innerHTML.toLowerCase().includes("demo")) {
+        el.innerHTML = el.innerHTML.replace(/demo/gi, "");
+      }
+    }
+  }
+
+  function scanAndRemoveDemo(root=document.body) {
+    const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    while(treeWalker.nextNode()) {
+      removeDemo(treeWalker.currentNode);
+    }
+    root.querySelectorAll("input, textarea, button, option").forEach(el => removeDemo(el));
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Initial scan
+    scanAndRemoveDemo();
+
+    // Watch for future changes
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            scanAndRemoveDemo(node);
+          } else {
+            removeDemo(node);
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+</script>
+
+<script>
+  function replaceDollarWithNaira(el) {
+    if (el.nodeType === Node.TEXT_NODE) {
+      if (el.nodeValue.includes("$")) {
+        el.nodeValue = el.nodeValue.replace(/\$/g, "₦");
+      }
+    } else if (el.nodeType === Node.ELEMENT_NODE) {
+      if (el.value && el.value.includes("$")) {
+        el.value = el.value.replace(/\$/g, "₦");
+      }
+      if (el.placeholder && el.placeholder.includes("$")) {
+        el.placeholder = el.placeholder.replace(/\$/g, "₦");
+      }
+      if (el.innerHTML && el.innerHTML.includes("$")) {
+        el.innerHTML = el.innerHTML.replace(/\$/g, "₦");
+      }
+    }
+  }
+
+  function scanAndReplace(root=document.body) {
+    const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    while(treeWalker.nextNode()) {
+      replaceDollarWithNaira(treeWalker.currentNode);
+    }
+    root.querySelectorAll("input, textarea, button, option").forEach(el => replaceDollarWithNaira(el));
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Initial scan
+    scanAndReplace();
+
+    // Watch for future changes
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            scanAndReplace(node);
+          } else {
+            replaceDollarWithNaira(node);
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+</script>
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cash Money</title>
+<style>
+  :root{
+    --teal:#008080; --coral:#FF6F61; --bg:#fafafa; --card:#fff;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,Arial,sans-serif;margin:0;background:var(--bg);color:#222}
+  header{background:linear-gradient(90deg,var(--teal),#006666);color:#fff;padding:28px 18px;text-align:center}
+  header h1{margin:0;font-size:20px}
+  header p{opacity:0.95;margin-top:8px;font-size:13px}
+  .wrap{max-width:980px;margin:22px auto;padding:0 16px}
+  .grid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+  .card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 20px rgba(10,10,10,0.06)}
+  label{display:block;font-size:13px;margin-bottom:6px}
+  input,select,textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #ddd;margin-bottom:10px}
+  button{background:var(--teal);color:#fff;border:0;padding:10px 12px;border-radius:8px;cursor:pointer}
+  .btn-secondary{background:#eee;color:#333;border:0}
+  .small{font-size:13px;color:#666}
+  .muted{color:#666;font-size:13px}
+  .balances{display:flex;gap:12px;flex-wrap:wrap}
+  .balance-pill{background:#f2fff8;border:1px solid rgba(0,128,128,0.06);padding:12px;border-radius:8px;min-width:140px;text-align:center}
+  .history{max-height:240px;overflow:auto;margin-top:10px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px;border-bottom:1px solid #f1f1f1;text-align:left;font-size:13px}
+  .danger{background:#fff3f3;border:1px solid #ffd6d6;color:#c0392b;padding:10px;border-radius:8px}
+  footer{margin:28px 0;text-align:center;color:#555;font-size:13px}
+  @media(max-width:880px){
+    .grid{grid-template-columns:1fr; }
+    .card{padding:14px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Cash Money</h1>
+  <p><strong></strong> Invest your money for a good profit</p>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- Main Column -->
+    <div>
+      <!-- Create / Login -->
+      <div class="card" id="accountCard">
+        <h3>1. Create / Switch Account</h3>
+        <div class="small muted">Sign Up.</div>
+        <label>Username</label>
+        <input id="usernameInput" placeholder="e.g. alice">
+        <label>Referral code (optional)</label>
+        <input id="refInput" placeholder="referrer username">
+        <div style="display:flex;gap:8px">
+          <button id="createBtn">Create & Switch</button>
+          <button class="btn-secondary" id="clearAllBtn">Reset Data</button>
+        </div>
+      </div>
+
+      <!-- Deposit & Referral -->
+      <div class="card" id="depositCard" style="margin-top:16px">
+        <div class="card" id="depositCard" style="margin-top:16px; padding:16px; border:1px solid #ddd; border-radius:10px;">
+  <h3>2. Make a Deposit</h3>
+  <div class="small muted">This only affects the main balance.</div>
+
+  <label for="depositAmount" style="display:block; margin-top:10px; font-weight:bold;">Amount (₦)</label>
+  <input id="depositAmount" type="number" min="5000" step="500" value="0.00" 
+         style="padding:8px; width:150px; margin-top:5px;">
+
+  <label style="display:block; margin-top:15px;">Referral (auto-fills if you were referred)</label>
+  <input id="depositRef" readonly style="padding:8px; width:250px;">
+
+  <div style="display:flex;gap:8px; margin-top:10px;">
+    <button id="depositBtn" style="padding:8px 14px; background:#0a7cff; color:#fff; border:none; border-radius:5px; cursor:pointer;">
+      Deposit
+    </button>
+    <button class="btn-secondary" id="giveBonusBtn" style="padding:8px 14px; background:#999; color:#fff; border:none; border-radius:5px; cursor:pointer;">
+      Get referral bonus
+    </button>
+  </div>
+
+  <div class="muted" style="margin-top:10px">
+    <strong>Note:</strong> Referral bonuses are simulated. This intentionally simplifies payouts.
+  </div>
+</div>
+
+<!-- Popup -->
+<div id="popup" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div class="popup-content" style="background:#fff; padding:20px; border-radius:10px; width:300px; text-align:center;">
+    <h3>Transfer to:</h3>
+    <p><strong>Account:</strong> 8024562069</p>
+    <p><strong>Bank:</strong> Opay</p>
+    <p><strong>Recipient:</strong> Peter</p>
+    <p id="showAmount" style="margin-top:10px; font-weight:bold;"></p>
+
+    <button id="copyBtn" style="background:#28a745; color:#fff; padding:8px 12px; border:none; border-radius:5px; margin:5px;">Copy Account</button>
+    <button id="transferBtn" style="background:#ff9800; color:#fff; padding:8px 12px; border:none; border-radius:5px; margin:5px;">I've Transferred</button>
+
+    <div id="loader" style="display:none; border:4px solid #f3f3f3; border-top:4px solid #3498db; border-radius:50%; width:30px; height:30px; animation:spin 1s linear infinite; margin:10px auto;"></div>
+    <p id="statusMsg" style="display:none; color:green; font-weight:bold;"></p>
+  </div>
+</div>
+
+<script>
+  const depositBtn = document.getElementById("depositBtn");
+  const depositAmount = document.getElementById("depositAmount");
+  const popup = document.getElementById("popup");
+  const copyBtn = document.getElementById("copyBtn");
+  const transferBtn = document.getElementById("transferBtn");
+  const loader = document.getElementById("loader");
+  const statusMsg = document.getElementById("statusMsg");
+  const showAmount = document.getElementById("showAmount");
+
+  // Handle deposit click
+  depositBtn.addEventListener("click", () => {
+    const amount = parseInt(depositAmount.value, 10);
+
+    if (amount < 5000) {
+      alert("❌ Value less than ₦5,000 naira, please check and try again");
+    } else {
+      showAmount.textContent = "Send ₦" + amount + " to the account above.";
+      popup.style.display = "flex";
+    }
+  });
+
+  // Copy account number
+  copyBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText("8847466").then(() => {
+      alert("✅ Account number copied!");
+    });
+  });
+
+  // Simulate transfer
+  transferBtn.addEventListener("click", () => {
+    loader.style.display = "block";
+    statusMsg.style.display = "none";
+    setTimeout(() => {
+      loader.style.display = "none";
+      statusMsg.style.display = "block";
+      statusMsg.textContent = "✅ Your balance will be updated soon!";
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 2000);
+    }, 3000);
+  });
+
+  // Loader animation
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+
+<!-- The rest of your payout simulator, history, sidebar, etc. remains unchanged -->
+
+</body>
+</html>     
+      <!-- Controls -->
+      <div class="card" style="margin-top:16px">
+        <h3>3. Payout Controls</h3>
+        <div class="small muted">Configure the simulated yield and run the automated engine.</div>
+        <label>Daily return percentage (simulated)</label>
+        <input id="dailyPct" type="number" min="0" step="0.1" value="0.05">
+        <label>Simulate interval (seconds per "day")</label>
+        <input id="tickSec" type="number" min="9" step="1" value="500">
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="startSimBtn">Start Simulator</button>
+          <button class="btn-secondary" id="stopSimBtn">Stop Simulator</button>
+          <button class="btn-secondary" id="fastTickBtn">Single Tick</button>
+        </div>
+        <div class="muted" style="margin-top:10px">The engine will add simulated returns to each account's pending balance every tick.</div>
+      </div>
+
+      <!-- Transaction history -->
+        <div class="card" style="margin-top:16px">
+  <h3>Transactions / History</h3>
+  <div class="history" id="historyBox">
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>User</th>
+          <th>Type</th>
+          <th>Amount (₦)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Example row -->
+        <tr>
+          <td>2025-10-02 12:30</td>
+          <td>Peter</td>
+          <td>Deposit</td>
+          <td>₦5,000</td>
+        </tr>
+        <tr>
+          <td>2025-10-02 14:00</td>
+          <td>Stella</td>
+          <td>Referral Bonus</td>
+          <td>₦1,000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+    <!-- Sidebar -->
+    <aside>
+      <div class="card">
+        <h3>Active Account</h3>
+        <div id="activeUser" style="font-size:18px;font-weight:700">—</div>
+        <div class="balances" style="margin-top:12px">
+          <div class="balance-pill">
+            <div class="small">Main Balance</div>
+            <div id="mainBal" style="font-size:18px;font-weight:700">$0.00</div>
+          </div>
+          <div class="balance-pill">
+            <div class="small">Pending Returns</div>
+            <div id="pendingBal" style="font-size:18px;font-weight:700">$0.00</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+   <!-- Withdraw Button -->
+<button id="withdrawBtn">Withdraw</button>
+
+<!-- Withdraw Form (hidden by default) -->
+<div id="withdrawForm" style="display:none; margin-top:16px; border:1px solid #ccc; padding:16px; border-radius:8px;">
+  <h3>Enter Withdrawal Details</h3>
+  
+  <label>Account Number:</label><br>
+  <input type="text" id="accountNumber" placeholder="Enter Account Number"><br><br>
+  
+  <label>Bank Name:</label><br>
+  <input type="text" id="bankName" placeholder="Enter Bank Name"><br><br>
+  
+  <label>Recipient Name:</label><br>
+  <input type="text" id="recipientName" placeholder="Enter Recipient Name"><br><br>
+  
+  <button id="submitWithdraw">Submit</button>
+  <button id="cancelWithdraw">Cancel</button>
+</div>
+
+<!-- Withdrawal Details Page (hidden by default) -->
+<div id="withdrawDetails" style="display:none; margin-top:16px; border:1px solid #ccc; padding:16px; border-radius:8px;">
+  <h3>Withdrawal Details</h3>
+  <p><strong>Account Number:</strong> <span id="detailAccount"></span></p>
+  <p><strong>Bank Name:</strong> <span id="detailBank"></span></p>
+  <p><strong>Recipient Name:</strong> <span id="detailRecipient"></span></p>
+  
+  <button id="closeDetails">Close</button>
+</div>
+
+<script>
+  const withdrawBtn = document.getElementById("withdrawBtn");
+  const withdrawForm = document.getElementById("withdrawForm");
+  const withdrawDetails = document.getElementById("withdrawDetails");
+
+  withdrawBtn.addEventListener("click", () => {
+    withdrawForm.style.display = "block";
+    withdrawDetails.style.display = "none";
+  });
+
+  document.getElementById("cancelWithdraw").addEventListener("click", () => {
+    withdrawForm.style.display = "none";
+  });
+
+  document.getElementById("submitWithdraw").addEventListener("click", () => {
+    const accNum = document.getElementById("accountNumber").value.trim();
+    const bank = document.getElementById("bankName").value.trim();
+    const recipient = document.getElementById("recipientName").value.trim();
+
+    if (!accNum || !bank || !recipient) {
+      alert("No data inputted. Please fill all fields.");
+    } else {
+      // Fill details
+      document.getElementById("detailAccount").textContent = accNum;
+      document.getElementById("detailBank").textContent = bank;
+      document.getElementById("detailRecipient").textContent = recipient;
+
+      // Show details page
+      withdrawForm.style.display = "none";
+      withdrawDetails.style.display = "block";
+    }
+  });
+
+  document.getElementById("closeDetails").addEventListener("click", () => {
+    withdrawDetails.style.display = "none";
+  });
+</script>
+
+          <div class="muted small" style="margin-top:8px">Withdraw moves pending returns to main balance which can be withdrawn every first Saturdays of each month.</div>
+        </div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px solid #f1f1f1">
+
+        <h4>Quick Links</h4>
+        <div class="small">
+          <div>Referral code for current user: <span id="myRef" style="font-weight:700">—</span></div>
+          <div style="margin-top:6px">Click to copy: <button class="btn-secondary" id="copyRefBtn">Copy</button></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Simulation Summary</h3>
+        <div class="small">
+          <div>Total demo accounts: <strong id="totalUsers">0</strong></div>
+          <div>Engine status: <strong id="engineStatus">stopped</strong></div>
+          <div style="margin-top:8px">Remember: this is real. Do not accept links from unauthorized sources</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3 class="danger">Legal & Safety</h3>
+        <div class="small">Building or running Ponzi schemes is illegal in many places. Use this only for your good.</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <div class="small">Created for profits only. All data stored locally in this browser (localStorage).</div>
+  </footer>
+</div>
+
+<script>
+/*
+  Front-end only simulator
+  - Accounts stored in localStorage under key "accounts"
+  - Each account: {user, main: number, pending: number, referrer: string, history: []}
+  - Simulator ticks every N seconds; applies dailyPct% to pending or to 'pending' as returns.
+  - This intentionally simplifies mechanics (no real money).
+*/
+
+// Utility
+const $ = id => document.getElementById(id);
+const LS_KEY = 'accounts_v1';
+
+// load or init
+let accounts = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+let activeUser = null;
+let simInterval = null;
+
+function save() {
+  localStorage.setItem(LS_KEY, JSON.stringify(accounts));
+  refreshUI();
+}
+
+function refreshUI(){
+  // active user display
+  $('totalUsers').textContent = Object.keys(accounts).length;
+  if(activeUser && accounts[activeUser]){
+    $('activeUser').textContent = activeUser;
+    $('mainBal').textContent = '$' + accounts[activeUser].main.toFixed(2);
+    $('pendingBal').textContent = '$' + accounts[activeUser].pending.toFixed(2);
+    $('myRef').textContent = activeUser;
+    $('depositRef').value = accounts[activeUser].referrer || '';
+  } else {
+    $('activeUser').textContent = '—';
+    $('mainBal').textContent = '$0.00';
+    $('pendingBal').textContent = '$0.00';
+    $('myRef').textContent = '—';
+    $('depositRef').value = '';
+  }
+  $('engineStatus').textContent = simInterval ? 'running' : 'stopped';
+  refreshHistory();
+}
+
+// History management
+function addHistory(user, type, amount){
+  const row = { time: new Date().toLocaleString(), user, type, amount };
+  // store globally as list under accounts.__history (simple approach)
+  if(!accounts.__history) accounts.__history = [];
+  accounts.__history.unshift(row);
+  if(accounts.__history.length>400) accounts.__history.length = 400;
+  save();
+}
+
+function refreshHistory(){
+  const tbody = document.querySelector('#historyTable tbody');
+  tbody.innerHTML = '';
+  const hist = accounts.__history || [];
+  for(let i=0;i<hist.length;i++){
+    const r=hist[i];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r.time}</td><td>${r.user}</td><td>${r.type}</td><td>$${Number(r.amount).toFixed(2)}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+// Create account
+$('createBtn').addEventListener('click', () => {
+  const u = $('usernameInput').value.trim();
+  const ref = $('refInput').value.trim();
+  if(!u){ alert('Enter a username'); return; }
+  if(!accounts[u]) {
+    accounts[u] = { user:u, main:0, pending:0, referrer: ref || null, history: [] };
+    addHistory(u, 'account_created', 0);
+  }
+  activeUser = u;
+  save();
+  $('usernameInput').value='';
+  $('refInput').value='';
+});
+
+// Reset data
+$('clearAllBtn').addEventListener('click', () => {
+  if(confirm('Reset all data in this browser? This cannot be undone.')) {
+    localStorage.removeItem(LS_KEY);
+    accounts = {};
+    activeUser = null;
+    save();
+  }
+});
+
+// Deposit
+$('depositBtn').addEventListener('click', () => {
+  if(!activeUser){ alert('Create or switch an account first'); return; }
+  const amt = parseFloat($('depositAmount').value);
+  if(isNaN(amt) || amt < 5){ alert('Minimum demo deposit is $5'); return; }
+  // In this simplified model deposit immediately adds to main balance
+  accounts[activeUser].main += amt;
+  accounts[activeUser].history.push({type:'deposit', amount:amt, time:Date.now()});
+  addHistory(activeUser, 'deposit', amt);
+
+  // referral bonus: if this user has a referrer, give small bonus to referrer
+  const ref = accounts[activeUser].referrer;
+  if(ref && accounts[ref]){
+    const bonus = Math.min(amt * 0.1, 50); // 10% capped at $50 (demo rules)
+    accounts[ref].pending += bonus;
+    addHistory(ref, 'referral_bonus', bonus);
+  }
+
+  save();
+});
+
+// Give referral bonus manually (for testing)
+$('giveBonusBtn').addEventListener('click', () => {
+  if(!activeUser){ alert('Create or switch an account first'); return; }
+  const ref = accounts[activeUser].referrer;
+  if(!ref || !accounts[ref]){ alert('No valid referrer for this account'); return; }
+  const bonus = 5; // demo fixed
+  accounts[ref].pending += bonus;
+  addHistory(ref, 'manual_ref_bonus', bonus);
+  save();
+});
+
+// Withdraw (simulate moving pending to main)
+$('withdrawBtn').addEventListener('click', () => {
+  if(!activeUser){ alert('Create or switch an account first'); return; }
+  const pending = accounts[activeUser].pending;
+  if(pending <= 0){ alert('No pending returns to withdraw'); return; }
+  accounts[activeUser].main += pending;
+  addHistory(activeUser, 'withdraw', pending);
+  accounts[activeUser].pending = 0;
+  save();
+});
+
+// Copy referral code
+$('copyRefBtn').addEventListener('click', () => {
+  if(!activeUser){ alert('No active user'); return; }
+  navigator.clipboard?.writeText(activeUser).then(()=>alert('Referral copied'));
+});
+
+// Tick simulator (apply percentage to pending or create returns)
+function tickOnce(){
+  const pct = parseFloat($('dailyPct').value) || 0;
+  // For each account: create "return" as percentage of main balance, added to pending
+  for(const k of Object.keys(accounts)){
+    if(k === '__history') continue;
+    const acc = accounts[k];
+    const dailyReturn = (acc.main * (pct/100));
+    if(dailyReturn > 0){
+      acc.pending += dailyReturn;
+      addHistory(k, 'simulated_return', dailyReturn);
+    }
+  }
+  save();
+}
+
+// Simulation control
+$('startSimBtn').addEventListener('click', () => {
+  if(simInterval) return alert('Simulator already running');
+  const sec = Math.max(1, parseInt($('tickSec').value,10) || 5);
+  simInterval = setInterval(()=> tickOnce(), sec*1000);
+  $('engineStatus').textContent = 'running';
+});
+
+$('stopSimBtn').addEventListener('click', () => {
+  if(simInterval){ clearInterval(simInterval); simInterval = null; $('engineStatus').textContent = 'stopped'; }
+});
+
+$('fastTickBtn').addEventListener('click', ()=> tickOnce());
+
+// Single load: if no accounts exist, create a sample admin for demo
+(function initDemo(){
+  if(!localStorage.getItem(LS_KEY)){
+    accounts = {};
+    accounts['alice'] = {user:'alice', main:100, pending:0, referrer:null, history:[]};
+    accounts['bob'] = {user:'bob', main:50, pending:0, referrer:'alice', history:[]};
+    accounts['charlie'] = {user:'charlie', main:20, pending:0, referrer:'bob', history:[]};
+    accounts.__history = [];
+    activeUser = 'alice';
+    save();
+  } else {
+    accounts = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+    // pick last used user or first
+    activeUser = Object.keys(accounts).find(k=>k!=='__history') || null;
+    refreshUI();
+  }
+})();
+
+refreshUI();
+
+</script>
+</body>
+</html>￼Enter
